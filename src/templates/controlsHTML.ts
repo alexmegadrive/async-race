@@ -17,4 +17,5 @@ export const controls = html` <div class="garage-controls" id="garage-controls">
     <button class="btn garage-btn" data-garage-action="reset">Reset</button>
     <button class="btn garage-btn" data-garage-action="generate">Generate cars</button>
   </div>
+  <div class="garage-pagination" id="garage-pagination"></div>
 </div>`;

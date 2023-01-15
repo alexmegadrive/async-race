@@ -155,29 +155,29 @@ export class Model {
         // const result =  response.json();
         if (!response.ok) {
           this.API_createWinner(winner);
-          console.log('Winner not found, creating winner');
+          // console.log('Winner not found, creating winner');
         } else {
           const winner = await this.API_getWinner(id);
           const wins = winner.wins + 1;
           let bestTime = winner.time;
           if (time < bestTime) bestTime = time;
           this.API_updateWinner(id, wins, bestTime);
-
-          console.log('response :', response);
-          console.log('response json:', response.json());
+          // console.log('response :', response);
+          // console.log('response json:', response.json());
         }
       })
       .catch((error) => {
         console.log(error);
       });
-    console.log('all winners', this.API_getWinners);
+    // console.log('all winners', this.API_getWinners);
   }
+
   async API_getWinner(id: number) {
     const response = await fetch(`${this.baseUrl}/winners/${id}`, {
       method: 'GET',
     });
     const result = await response.json();
-    console.log('result getWinner:', result);
+    // console.log('result getWinner:', result);
 
     return result;
   }
