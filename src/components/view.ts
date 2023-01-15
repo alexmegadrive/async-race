@@ -137,6 +137,10 @@ export class View {
 
   handleResetCars() {
     const cars: NodeListOf<HTMLElement> = document.querySelectorAll('.car');
+    const startBtns: NodeListOf<HTMLElement> = document.querySelectorAll('[data-car-action="start"]');
+    const stopBtns: NodeListOf<HTMLElement> = document.querySelectorAll('[data-car-action="stop"]');
+    startBtns.forEach((btn) => btn.classList.remove('btn--disabled'));
+    stopBtns.forEach((btn) => btn.classList.add('btn--disabled'));
     cars.forEach((car) => car.classList.add('parking'));
   }
   handleCreateCar() {
