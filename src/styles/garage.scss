@@ -1,0 +1,101 @@
+.garage-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.garage-btn {
+  width: 120px;
+  height: 30px;
+}
+.garage-controls_line {
+  display: flex;
+  gap: 5px;
+}
+
+.garage-race {
+  margin-top: 50px;
+  width: 100%;
+}
+.car-box {
+  padding: 20px 0;
+  width: 100%;
+  border-bottom: 2px dotted red;
+
+  // .car-box__car-controls
+
+  &__car-controls {
+    display: flex;
+    height: 30px;
+    gap: 5px;
+  }
+
+  &__track-container {
+    position: relative;
+    width: 90%;
+    display: flex;
+    align-items: center;
+
+    &::after {
+      position: absolute;
+      content: '';
+      width: 50px;
+      height: 100%;
+      background-repeat: no-repeat;
+
+      background: url('./assets/img/red-flag.png');
+      background-size: contain;
+      right: 0;
+      bottom: 0;
+    }
+  }
+
+  &__track-controls {
+    display: flex;
+    gap: 5px;
+  }
+  &__car-track {
+    width: 100%;
+  }
+}
+.track-control-btn {
+  position: relative;
+  width: 50px;
+  height: 30px;
+  border-radius: 5px;
+
+  &:before {
+    position: absolute;
+    transform: translate(-50%, -50%);
+  }
+}
+.track-control-btn--start {
+  color: green;
+  &:before {
+    content: '🚀';
+  }
+}
+.track-control-btn--stop {
+  color: red;
+  &:before {
+    content: '🛑';
+    // width: 20px;
+    // height: 20px;
+    // background: red;
+    // border-radius: 50%;
+  }
+}
+
+.car-controls__btn {
+}
+.car-controls__name {
+  height: 100%;
+  color: orange;
+}
+
+#update-id-input {
+  display: none;
+}
+
+.parking {
+  left: 0 !important;
+}
