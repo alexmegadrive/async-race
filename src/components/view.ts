@@ -220,7 +220,7 @@ export class View {
             return this.model.API_controlEngine(carId, 'drive');
           })
           .then((result) => {
-            console.log('this.raceIsActive from 2 promise :', this.raceIsActive);
+            // console.log('this.raceIsActive from 2 promise :', this.raceIsActive);
             if (this.raceIsActive) {
               if (!currentWinnerId) {
                 this.raceIsActive = false;
@@ -244,6 +244,8 @@ export class View {
           })
           .finally(() => {
             clearInterval(carMovingProgress);
+            startBtn.classList.remove('btn--disabled');
+            stopBtn.classList.add('btn--disabled');
             // if (startBtn.classList.contains('btn--disabled')) {
             //   setTimeout(() => {
             //     startBtn.classList.remove('btn--disabled');
