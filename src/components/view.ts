@@ -204,7 +204,14 @@ export class View {
             let currentProgress = 0;
             carMovingProgress = setInterval(() => {
               currentProgress += step;
-              if (carFigure) carFigure.style.left = `${currentProgress * 100}%`;
+              if (carFigure && startBtn.classList.contains('btn--disabled')) {
+                carFigure.style.left = `${currentProgress * 100}%`;
+              }
+              stopBtn.addEventListener('click', () => {
+                clearInterval(carMovingProgress);
+                return;
+              });
+              // if (carFigure)
             }, 100);
             return this.model.API_controlEngine(carId, 'drive');
           })
@@ -233,19 +240,20 @@ export class View {
           })
           .finally(() => {
             clearInterval(carMovingProgress);
-            setTimeout(() => {
-              startBtn.classList.remove('btn--disabled');
-              stopBtn.classList.add('btn--disabled');
-
-              carFigure.style.left = '0%';
-            }, 8000);
+            // if (startBtn.classList.contains('btn--disabled')) {
+            //   setTimeout(() => {
+            //     startBtn.classList.remove('btn--disabled');
+            //     stopBtn.classList.add('btn--disabled');
+            //     carFigure.style.left = '0%';
+            //   }, 8000);
+            // }
           });
       };
       const handleStopCar = async () => {
         const result = await this.model.API_controlEngine(carId, 'stopped');
         stopBtn.classList.add('btn--disabled');
         startBtn.classList.remove('btn--disabled');
-
+        carFigure.style.left = '0';
         carFigure.classList.add('parking');
 
         console.log(result);
