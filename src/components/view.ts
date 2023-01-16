@@ -1,10 +1,17 @@
 import { html } from 'code-tag';
 import { Model } from './model';
-import { controls } from '../templates/controlsHTML';
-import { garage } from '../templates/garageHTML';
+import { UISwitch as uiControls } from '../templates/navHTML';
+// import { UISwitch, controls } from '../templates/controlsHTML';
+import { garage as garageView } from '../templates/garageHTML';
 import { header } from '../templates/headerHTML';
-import { winners } from '../templates/winnersHTML';
+import { winners as winnersView } from '../templates/winnersHTML';
 import { IGarageCar } from './model';
+import { IWinner } from './model';
+
+enum WinnersSort {
+  time = 'time',
+  wins = 'wins',
+}
 
 export class View {
   model: Model;
@@ -12,6 +19,7 @@ export class View {
   page: number;
   perPage: number;
   raceIsActive: boolean;
+  winnersSort: WinnersSort;
   // currentWinnerId: number | null;
   constructor() {
     this.model = new Model();
@@ -19,20 +27,68 @@ export class View {
     this.page = 1;
     this.perPage = 7;
     this.raceIsActive = false;
+    this.winnersSort = WinnersSort.time;
     // this.currentWinnerId = null;
   }
 
   renderUI() {
     if (this.app) {
-      this.app.insertAdjacentHTML('beforeend', controls);
-      this.app.insertAdjacentHTML('beforeend', garage);
+      this.app.insertAdjacentHTML('beforeend', uiControls);
+      // this.app.insertAdjacentHTML('beforeend', controls);
+      this.app.insertAdjacentHTML('beforeend', garageView);
+      this.app.insertAdjacentHTML('beforeend', winnersView);
     }
-    this.renderGarage(this.page);
-    this.addGarageControlListeners();
+    this.renderGarageCars(this.page);
+    this.addControlListeners();
     this.addCarControlListeners();
+
+    this.renderPaginationBtns();
   }
 
-  async renderGarage(page: number) {
+  async renderWinners() {
+    const winnersList = document.querySelector('#winners-list');
+    const winners: IWinner[] = await this.model.API_getWinners();
+    const winnersTemplate = html`<table class="GeneratedTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Car</th>
+          <th>Name</th>
+          <th>Wins</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        *
+      </tbody>
+    </table>`;
+    const index = winnersTemplate.indexOf('*');
+
+    const sortFunc =
+      this.winnersSort === WinnersSort.time
+        ? (a: IWinner, b: IWinner) => a.time - b.time
+        : (a: IWinner, b: IWinner) => a.wins - b.wins;
+
+    let winnerRows = '';
+    if (winnersList) {
+      winnersList.innerHTML = '';
+    }
+
+    winners.sort(sortFunc).forEach((winner) => {
+      winnerRows += `<tr>
+      <th>${winner.id}</th>
+      <th><div class="car" style="background: ${winner.color}"></div></th>
+      <th>${winner.name}</th>
+      <th>${winner.wins}</th>
+      <th>${winner.time}</th>
+      </tr>`;
+    });
+
+    let winnersTable = winnersTemplate.substring(0, index) + winnerRows + winnersTemplate.substring(index);
+    winnersList?.insertAdjacentHTML('beforeend', winnersTable);
+  }
+
+  async renderGarageCars(page: number) {
     const response = await this.model.API_getCars(page);
     const garage = document.querySelector('#garage-list');
     const totalCount = response.totalCount;
@@ -43,10 +99,14 @@ export class View {
       const carHtml = this.renderGarageCar(car);
       garage?.insertAdjacentHTML('beforeend', carHtml);
     });
-    this.renderPaginationBtns(totalCount);
+
+    // this.renderPaginationBtns(totalCount);
   }
 
-  renderPaginationBtns(totalCount: number) {
+  async renderPaginationBtns() {
+    const response = await this.model.API_getCars(0);
+    const totalCount = response.totalCount;
+    // this.renderPaginationBtns(totalCount);
     const totalPages = Math.ceil(totalCount / 7);
     const paginationContainer = document.querySelector('#garage-pagination');
     if (paginationContainer) paginationContainer.innerHTML = '';
@@ -58,11 +118,15 @@ export class View {
         pagBtn.setAttribute('data-page', i.toString());
         pagBtn.innerText = i.toString();
         pagBtn.onclick = () => {
+          const pagBtns: NodeListOf<HTMLElement> = document.querySelectorAll('.pagination__button');
+          pagBtns.forEach((btn) => btn.classList.remove('pagination__button--active'));
+          pagBtn.classList.add('pagination__button--active');
           this.page = i;
-          this.renderGarage(this.page);
+          this.renderGarageCars(this.page);
         };
         if (paginationContainer) paginationContainer.append(pagBtn);
       }
+      document.querySelector(`[data-page="${this.page}"]`)?.classList.add('pagination__button--active');
     }
   }
 
@@ -75,9 +139,9 @@ export class View {
         <button class="btn car-controls__btn" data-car-id="${car.id.toString()}" data-car-action="remove">
           Remove
         </button>
-        <button class="btn car-controls__btn" data-car-id="${car.id.toString()}" data-car-action="create-winner">
+        <!-- <button class="btn car-controls__btn" data-car-id="${car.id.toString()}" data-car-action="create-winner">
           test create winner
-        </button>
+        </button> -->
         <div class="car-controls__name">${car.name}</div>
       </div>
       <div class="car-box__track-container">
@@ -94,20 +158,30 @@ export class View {
           ></button>
         </div>
         <div class="car-box__car-track">
-          <div class="car"></div>
+          <div class="car" style="background: ${car.color}"></div>
         </div>
       </div>
     </div>`;
     return carHtml;
   }
 
-  renderWinners() {
-    //
-  }
+  addControlListeners() {
+    const garageControls = document.querySelector('#garage-controls') as HTMLElement;
+    const garageView = document.querySelector('#garage-view') as HTMLElement;
+    const winnersView = document.querySelector('#winners-view') as HTMLElement;
+    const navigateGarage = document.querySelector('#switch-garage');
+    const navigateWinners = document.querySelector('#switch-winners');
 
-  addGarageControlListeners() {
-    const garage = document.querySelector('#garage-controls');
-    garage?.addEventListener('click', async (e) => {
+    navigateGarage?.addEventListener('click', () => {
+      if (garageView) garageView.hidden = false;
+      if (winnersView) winnersView.hidden = true;
+    });
+    navigateWinners?.addEventListener('click', () => {
+      if (garageView) garageView.hidden = true;
+      if (winnersView) winnersView.hidden = false;
+      this.renderWinners();
+    });
+    garageControls?.addEventListener('click', async (e) => {
       console.log('click garage');
       const target = e.target as HTMLElement;
       const action = target?.dataset?.garageAction;
@@ -141,7 +215,10 @@ export class View {
     const stopBtns: NodeListOf<HTMLElement> = document.querySelectorAll('[data-car-action="stop"]');
     startBtns.forEach((btn) => btn.classList.remove('btn--disabled'));
     stopBtns.forEach((btn) => btn.classList.add('btn--disabled'));
-    cars.forEach((car) => car.classList.add('parking'));
+    cars.forEach((car) => {
+      car.style.left = '0';
+      car.classList.add('parking');
+    });
   }
   handleCreateCar() {
     const nameInput = document.querySelector('#new-name-input') as HTMLInputElement;
@@ -149,20 +226,24 @@ export class View {
     const name = nameInput.value;
     const color = colorInput.value;
     this.model.API_createCar(name, color);
+    this.renderPaginationBtns();
   }
-  handleUpdateCar() {
+  async handleUpdateCar() {
     const nameInput = document.querySelector('#update-name-input') as HTMLInputElement;
     const colorInput = document.querySelector('#update-color-input') as HTMLInputElement;
     const idInput = document.querySelector('#update-id-input') as HTMLInputElement;
     const name = nameInput.value;
     const id = Number(idInput.value);
     const color = colorInput.value;
-    this.model.API_updateCar(id, name, color);
+    await this.model.API_updateCar(id, name, color);
+    this.renderGarageCars(this.page);
   }
+
   handleGenerateCars() {
     this.model.generateCars();
     setTimeout(() => {
-      this.renderGarage(this.page);
+      this.renderGarageCars(this.page);
+      this.renderPaginationBtns();
     }, 1000);
   }
 
@@ -198,8 +279,9 @@ export class View {
         const startTime: number = new Date().getTime();
         startBtn.classList.add('btn--disabled');
         stopBtn.classList.remove('btn--disabled');
-        console.log('startTime :', startTime);
+        // console.log('startTime :', startTime);
         carFigure.classList.remove('parking');
+        carFigure.style.left = '0';
         this.model
           .API_controlEngine(carId, 'started')
           .then((result) => {
@@ -209,7 +291,7 @@ export class View {
             carMovingProgress = setInterval(() => {
               currentProgress += step;
               if (carFigure && startBtn.classList.contains('btn--disabled')) {
-                carFigure.style.left = `${currentProgress * 100}%`;
+                carFigure.style.left = `${currentProgress <= 1 ? currentProgress * 100 : 100}%`;
               }
               stopBtn.addEventListener('click', () => {
                 clearInterval(carMovingProgress);
@@ -264,10 +346,12 @@ export class View {
 
         console.log(result);
       };
-      const handleRemoveCar = (id: number) => {
-        this.model.API_removeCar(id);
-        const carItem = target.closest('.car-box');
-        carItem?.remove();
+      const handleRemoveCar = async (id: number) => {
+        await this.model.API_removeCar(id);
+        // const carItem = target.closest('.car-box');
+        // carItem?.remove();
+        this.renderGarageCars(this.page);
+        this.renderPaginationBtns();
       };
       const handleSelectCar = (id: number) => {
         const nameInput = document.querySelector('#update-name-input') as HTMLInputElement;

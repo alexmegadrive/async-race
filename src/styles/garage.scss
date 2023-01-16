@@ -1,4 +1,5 @@
 .garage-controls {
+  padding: 30px 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -13,11 +14,11 @@
 }
 
 .garage-race {
-  margin-top: 50px;
+  // margin-top: 50px;
   width: 100%;
 }
 .car-box {
-  padding: 20px 0;
+  margin-top: 20px;
   width: 100%;
   border-bottom: 2px dotted red;
 
@@ -51,6 +52,7 @@
 
   &__track-controls {
     display: flex;
+    margin-right: 10px;
     gap: 5px;
   }
   &__car-track {
@@ -98,4 +100,22 @@
 
 .parking {
   left: 0 !important;
+}
+
+.pagination__button {
+  color: black;
+  // float: left;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 5px;
+  border: none;
+  background: none;
+  &:hover:not(.pagination__button--active) {
+    background-color: #ddd;
+  }
+  &--active {
+    background-color: #4caf50;
+    color: white;
+    border-radius: 5px;
+  }
 }
