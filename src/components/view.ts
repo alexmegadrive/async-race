@@ -42,13 +42,14 @@ export class View {
     this.addControlListeners();
     this.addCarControlListeners();
     this.addSortWinnersListeners();
-    // this.renderGaragePaginationBtns();
-    const getCars = this.model.API_getCars.bind(this.model);
-    const renderCars = this.pureRenderGarageCars.bind(this);
+    this.renderGaragePaginationBtns();
+    // const getCars = this.model.API_getCars.bind(this.model);
+    // const renderCars = this.pureRenderGarageCars.bind(this);
 
-    const testGaragaRender = this.renderPaginationBtnsTemplate.bind(this.model, 'garage', getCars, renderCars);
+    // const testGaragaRender = this.renderPaginationBtnsTemplate.bind(this.model, 'garage', getCars, renderCars);
     // const testWinnersRender = this.renderPaginationBtnsTemplate.bind(this.model, 'garage', getWinners, renderWinners);
-    testGaragaRender();
+    // testGaragaRender();
+
     // const getWinners = this.model.API_getWinners.bind(this.model);
 
     // const testGarage = this.renderPaginationBtnsTemplate.bind(
@@ -128,59 +129,59 @@ export class View {
     // this.renderPaginationBtns(totalCount);
   }
 
-  async pureRenderWinners(winners: WinnerCars, sort = WinnersSort.time) {
-    const winnersList = document.querySelector('#winners-list');
-    // const winners: IWinner[] = (await this.model.API_getWinners(page)).winners;
-    const winnersTemplate = html`<table class="GeneratedTable">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Car</th>
-          <th>Name</th>
-          <th>Wins</th>
-          <th>Time</th>
-        </tr>
-      </thead>
-      <tbody>
-        *
-      </tbody>
-    </table>`;
-    const index = winnersTemplate.indexOf('*');
-    const sortFunc =
-      sort === WinnersSort.time
-        ? (a: IWinner, b: IWinner) => a.time - b.time
-        : (a: IWinner, b: IWinner) => b.wins - a.wins;
-    let winnerRows = '';
-    if (winnersList) {
-      winnersList.innerHTML = '';
-    }
+  // async pureRenderWinners(winners: WinnerCars, sort = WinnersSort.time) {
+  //   const winnersList = document.querySelector('#winners-list');
+  //   // const winners: IWinner[] = (await this.model.API_getWinners(page)).winners;
+  //   const winnersTemplate = html`<table class="GeneratedTable">
+  //     <thead>
+  //       <tr>
+  //         <th>ID</th>
+  //         <th>Car</th>
+  //         <th>Name</th>
+  //         <th>Wins</th>
+  //         <th>Time</th>
+  //       </tr>
+  //     </thead>
+  //     <tbody>
+  //       *
+  //     </tbody>
+  //   </table>`;
+  //   const index = winnersTemplate.indexOf('*');
+  //   const sortFunc =
+  //     sort === WinnersSort.time
+  //       ? (a: IWinner, b: IWinner) => a.time - b.time
+  //       : (a: IWinner, b: IWinner) => b.wins - a.wins;
+  //   let winnerRows = '';
+  //   if (winnersList) {
+  //     winnersList.innerHTML = '';
+  //   }
 
-    // console.log('winners :', winners);
-    winners.sort(sortFunc).forEach((winner) => {
-      winnerRows += `<tr>
-      <th>${winner.id}</th>
-      <th><div class="car" style="background: ${winner.color}"></div></th>
-      <th>${winner.name}</th>
-      <th>${winner.wins}</th>
-      <th>${winner.time}</th>
-      </tr>`;
-    });
+  //   // console.log('winners :', winners);
+  //   winners.sort(sortFunc).forEach((winner) => {
+  //     winnerRows += `<tr>
+  //     <th>${winner.id}</th>
+  //     <th><div class="car" style="background: ${winner.color}"></div></th>
+  //     <th>${winner.name}</th>
+  //     <th>${winner.wins}</th>
+  //     <th>${winner.time}</th>
+  //     </tr>`;
+  //   });
 
-    let winnersTable = winnersTemplate.substring(0, index - 1) + winnerRows + winnersTemplate.substring(index);
-    winnersList?.insertAdjacentHTML('beforeend', winnersTable);
-  }
+  //   let winnersTable = winnersTemplate.substring(0, index - 1) + winnerRows + winnersTemplate.substring(index);
+  //   winnersList?.insertAdjacentHTML('beforeend', winnersTable);
+  // }
 
-  pureRenderGarageCars(cars: GarageCars) {
-    // console.log('pureRenderGarageCars :', cars);
-    const garage = document.querySelector('#garage-list');
-    if (garage) garage.innerHTML = '';
-    // console.log('garage :', garage);
-    cars.forEach((car: IGarageCar) => {
-      const carHtml = this.renderGarageCar(car);
-      // console.log('carHtml :', carHtml);
-      garage?.insertAdjacentHTML('beforeend', carHtml);
-    });
-  }
+  // pureRenderGarageCars(cars: GarageCars) {
+  //   // console.log('pureRenderGarageCars :', cars);
+  //   const garage = document.querySelector('#garage-list');
+  //   if (garage) garage.innerHTML = '';
+  //   // console.log('garage :', garage);
+  //   cars.forEach((car: IGarageCar) => {
+  //     const carHtml = this.renderGarageCar(car);
+  //     // console.log('carHtml :', carHtml);
+  //     garage?.insertAdjacentHTML('beforeend', carHtml);
+  //   });
+  // }
 
   async renderGaragePaginationBtns() {
     const paginationContainer = document.querySelector('#garage-pagination');
@@ -257,63 +258,63 @@ export class View {
   //     this.renderPaginationBtnsTemplate(this.model.API_getCars, this.currentPageGarage, '#garage-pagination');
   // }
 
-  async renderPaginationBtnsTemplate(
-    type: 'garage' | 'winners',
-    callbackGet: (page: number) => Promise<IGetCarsResponse>,
-    callbackRender:
-      | ((array: GarageCars) => void)
-      | ((winners: WinnerCars, sort: WinnersSort = WinnersSort.time) => void)
-    // callbackGet: (
-    //   page: number
-    // ) => Promise<{ cars: GarageCars; totalCount: number }> | Promise<{ winners: IWinner[]; totalCount: number }>,
-    // callbackRender: (page: number) => void,
-    // pageVar: number,
-    // containerId: string
-  ) {
-    if (type === 'garage') {
-    }
-    // let callbackGet: (
-    // page: number
-    // ) => Promise<{ cars: GarageCars; totalCount: number }> | Promise<{ winners: IWinner[]; totalCount: number }>;
-    // let callbackRender: (array: GarageCars) => void;
-    let pageVar: number;
-    let containerId: string;
+  // async renderPaginationBtnsTemplate(
+  //   type: 'garage' | 'winners',
+  //   callbackGet: (page: number) => Promise<IGetCarsResponse>,
+  //   callbackRender:
+  //     | ((array: GarageCars) => void)
+  //     | ((winners: WinnerCars, sort: WinnersSort = WinnersSort.time) => void)
+  //   // callbackGet: (
+  //   //   page: number
+  //   // ) => Promise<{ cars: GarageCars; totalCount: number }> | Promise<{ winners: IWinner[]; totalCount: number }>,
+  //   // callbackRender: (page: number) => void,
+  //   // pageVar: number,
+  //   // containerId: string
+  // ) {
+  //   if (type === 'garage') {
+  //   }
+  //   // let callbackGet: (
+  //   // page: number
+  //   // ) => Promise<{ cars: GarageCars; totalCount: number }> | Promise<{ winners: IWinner[]; totalCount: number }>;
+  //   // let callbackRender: (array: GarageCars) => void;
+  //   let pageVar: number;
+  //   let containerId: string;
 
-    // callbackGet = this.model.API_getCars;
-    // callbackRender = this.pureRenderGarageCars;
-    pageVar = this.currentPageGarage;
-    containerId = '#garage-pagination';
+  //   // callbackGet = this.model.API_getCars;
+  //   // callbackRender = this.pureRenderGarageCars;
+  //   pageVar = this.currentPageGarage;
+  //   containerId = '#garage-pagination';
 
-    const response = await callbackGet(0);
-    const totalCount = response.totalCount;
-    const perPage = containerId === '#garage-pagination' ? 7 : 10;
-    const totalPages = Math.ceil(totalCount / perPage);
-    const paginationContainer = document.querySelector(`${containerId}`);
-    if (paginationContainer) paginationContainer.innerHTML = '';
-    if (totalPages > 1) {
-      if (paginationContainer) paginationContainer.innerHTML = 'Page: ';
-      for (let i = 1; i <= totalPages; i++) {
-        const pagBtn = document.createElement('button');
-        pagBtn.classList.add('pagination__button');
-        pagBtn.setAttribute('data-page', i.toString());
-        pagBtn.innerText = i.toString();
-        pagBtn.onclick = async () => {
-          if (!paginationContainer) return;
-          const pagBtns: NodeListOf<HTMLElement> = paginationContainer.querySelectorAll('.pagination__button');
-          pagBtns.forEach((btn) => btn.classList.remove('pagination__button--active'));
-          pagBtn.classList.add('pagination__button--active');
-          // this.currentPageGarage = i;
-          // console.log('this.currentPageGarage :', this.currentPageGarage);
-          // console.log('callbackRender :', callbackRender);
-          const response = await callbackGet(i);
-          console.log('response :', response);
-          callbackRender(response.cars);
-        };
-        if (paginationContainer) paginationContainer.append(pagBtn);
-      }
-      // document.querySelector(`[data-page="${this.currentPageGarage}"]`)?.classList.add('pagination__button--active');
-    }
-  }
+  //   const response = await callbackGet(0);
+  //   const totalCount = response.totalCount;
+  //   const perPage = containerId === '#garage-pagination' ? 7 : 10;
+  //   const totalPages = Math.ceil(totalCount / perPage);
+  //   const paginationContainer = document.querySelector(`${containerId}`);
+  //   if (paginationContainer) paginationContainer.innerHTML = '';
+  //   if (totalPages > 1) {
+  //     if (paginationContainer) paginationContainer.innerHTML = 'Page: ';
+  //     for (let i = 1; i <= totalPages; i++) {
+  //       const pagBtn = document.createElement('button');
+  //       pagBtn.classList.add('pagination__button');
+  //       pagBtn.setAttribute('data-page', i.toString());
+  //       pagBtn.innerText = i.toString();
+  //       pagBtn.onclick = async () => {
+  //         if (!paginationContainer) return;
+  //         const pagBtns: NodeListOf<HTMLElement> = paginationContainer.querySelectorAll('.pagination__button');
+  //         pagBtns.forEach((btn) => btn.classList.remove('pagination__button--active'));
+  //         pagBtn.classList.add('pagination__button--active');
+  //         // this.currentPageGarage = i;
+  //         // console.log('this.currentPageGarage :', this.currentPageGarage);
+  //         // console.log('callbackRender :', callbackRender);
+  //         const response = await callbackGet(i);
+  //         console.log('response :', response);
+  //         callbackRender(response.cars);
+  //       };
+  //       if (paginationContainer) paginationContainer.append(pagBtn);
+  //     }
+  //     // document.querySelector(`[data-page="${this.currentPageGarage}"]`)?.classList.add('pagination__button--active');
+  //   }
+  // }
 
   renderGarageCar(car: IGarageCar) {
     const carHtml = html`<div class="car-box" data-car-id="${car.id.toString()}" data-car-color="${car.color}">
@@ -357,8 +358,8 @@ export class View {
     const navigateGarage = document.querySelector('#switch-garage');
     const navigateWinners = document.querySelector('#switch-winners');
     const getWinners = this.model.API_getWinners.bind(this.model);
-    const renderWinners = this.pureRenderWinners.bind(this);
-    const testWinnersRender = this.renderPaginationBtnsTemplate.bind(this.model, 'garage', getWinners, renderWinners);
+    // const renderWinners = this.pureRenderWinners.bind(this);
+    // const testWinnersRender = this.renderPaginationBtnsTemplate.bind(this.model, 'garage', getWinners, renderWinners);
 
     navigateGarage?.addEventListener('click', () => {
       if (garageView) garageView.hidden = false;
@@ -367,8 +368,8 @@ export class View {
     navigateWinners?.addEventListener('click', () => {
       if (garageView) garageView.hidden = true;
       if (winnersView) winnersView.hidden = false;
-      // this.renderWinnersPaginationBtns();
-      testWinnersRender();
+      this.renderWinnersPaginationBtns();
+      // testWinnersRender();
       this.renderWinners(this.currentPageWinners);
     });
     garageControls?.addEventListener('click', async (e) => {
