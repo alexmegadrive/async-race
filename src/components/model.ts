@@ -8,13 +8,15 @@ export interface IGarageCar {
   id: number;
   name: string;
   color: string;
+  wins?: number;
+  time?: number;
 }
 
-export interface IWinnerCar {
-  id: number;
-  wins: number;
-  bestTime: string;
-}
+// export interface IWinnerCar {
+//   id: number;
+//   wins: number;
+//   bestTime: string;
+// }
 export interface IWinner {
   id: number;
   wins: number;
@@ -30,7 +32,11 @@ export interface INewWinner {
 }
 
 export type GarageCars = IGarageCar[];
-export type WinnerCars = IWinnerCar[];
+export type WinnerCars = IWinner[];
+export interface IGetCarsResponse {
+  cars: GarageCars | WinnerCars;
+  totalCount: number;
+}
 
 export class Model {
   garageCars: GarageCars;
@@ -71,6 +77,8 @@ export class Model {
   }
 
   async API_getCars(page: number) {
+    // console.log('this getcars', this);
+    // console.log('this.baseUrl :', this.baseUrl);
     const perPage = 7;
     let cars: GarageCars = [];
     let totalCount = 0;
@@ -97,14 +105,40 @@ export class Model {
     return { cars, totalCount };
   }
 
-  async API_getWinners() {
-    const cars = this.API_getCars(0);
-    const response = await fetch(`${this.baseUrl}/winners`);
-    const result = await response.json();
-    // console.log('winners from api :', result);
-    return result;
-  }
+  async API_getWinners(page: number) {
+    // const cars = this.API_getCars(0);
+    // const response = await fetch(`${this.baseUrl}/winners`);;
+    // const result = await response.json();
+    const perPage = 10;
 
+    let cars: WinnerCars = [];
+
+    // console.log('winners from api :', result);
+    // return result;
+
+    let totalCount = 0;
+    if (!page && !perPage) {
+      const response = await fetch(`${this.baseUrl}/winners`);
+      cars = await response.json();
+      // console.log('response :', response);
+      // console.log('result getcars:', result);
+      // this.garageCars = cars;
+    } else {
+      const response = await fetch(
+        `${this.baseUrl}/winners${this.generateQueryString([
+          { key: '_page', value: page.toString() },
+          { key: '_limit', value: perPage.toString() },
+        ])}`
+      );
+      cars = await response.json();
+      totalCount = Number(response.headers.get('X-Total-Count'));
+      // console.log('totalPagesCount :', totalCount);
+      // console.log('response :', response);
+      // console.log('result getcars :', result);
+      // this.garageCars = cars;
+    }
+    return { cars, totalCount };
+  }
 
   async API_getCar(id: number) {
     const response = await fetch(`${this.baseUrl}/garage/${id}`, {
@@ -148,8 +182,6 @@ export class Model {
     return response;
   }
 
-  
-
   async API_handleWinner(winner: INewWinner) {
     // console.log('new winner :', winner);
     const { id, time, name, color } = winner;
@@ -174,8 +206,8 @@ export class Model {
         // console.log('winners', winners);
       }
     });
-    const winners = await this.API_getWinners();
-    console.log('winners', winners);
+    // const winners = await this.API_getWinners();
+    // console.log('winners', winners);
     // const response = await this.API_getWinner(id);
 
     // await this.API_getWinner(id)
