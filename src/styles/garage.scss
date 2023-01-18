@@ -1,0 +1,162 @@
+.garage-controls {
+  display: flex;
+  flex-direction: column;
+  padding: 30px 0;
+  gap: 10px;
+}
+.garage-btn {
+  width: 120px;
+  height: 30px;
+}
+.garage-controls_line {
+  display: flex;
+  gap: 5px;
+}
+
+.garage-race {
+  display: flex;
+  flex-direction: column;
+  // margin-top: 50px;
+  width: 100%;
+  gap: 20px;
+}
+.car-box {
+  // margin-top: 20px;
+  width: 100%;
+  border-bottom: 2px dotted red;
+
+  // .car-box__car-controls
+
+  &__car-controls {
+    display: flex;
+    height: 30px;
+    gap: 5px;
+  }
+
+  &__track-container {
+    display: flex;
+    position: relative;
+    align-items: center;
+    width: 90%;
+
+    &::after {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 50px;
+      height: 100%;
+
+      background: url('./assets/img/red-flag.png');
+      background-repeat: no-repeat;
+      background-size: contain;
+      content: '';
+    }
+  }
+
+  &__track-controls {
+    display: flex;
+    margin-right: 10px;
+    gap: 5px;
+  }
+  &__car-track {
+    width: 100%;
+  }
+}
+.track-control-btn {
+  position: relative;
+  width: 50px;
+  height: 30px;
+  border-radius: 5px;
+
+  &:before {
+    position: absolute;
+    transform: translate(-50%, -50%);
+  }
+}
+.track-control-btn--start {
+  color: green;
+  &:before {
+    content: '🚀';
+  }
+}
+.track-control-btn--stop {
+  color: red;
+  &:before {
+    content: '🛑';
+    // width: 20px;
+    // height: 20px;
+    // background: red;
+    // border-radius: 50%;
+  }
+}
+
+.car-controls__btn {
+}
+.car-controls__name {
+  height: 100%;
+  color: orange;
+}
+
+#update-id-input {
+  display: none;
+}
+
+.parking {
+  left: 0 !important;
+}
+
+.pagination__button {
+  // float: left;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  background: none;
+  color: black;
+  text-decoration: none;
+  &:hover:not(.pagination__button--active) {
+    background-color: #ddd;
+  }
+  &--active {
+    border-radius: 5px;
+    background-color: #4caf50;
+    color: white;
+  }
+}
+
+.modal {
+  display: flex;
+  z-index: -1;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  height: fit-content;
+  // filter: blur(11px);
+  padding: 30px;
+  transform: translate(-50%, -50%);
+  border-radius: 30px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  font-size: 2rem;
+  text-align: center;
+  opacity: 0;
+  transition: 0.1s ease-in;
+  &--active {
+    z-index: 2000;
+    opacity: 1;
+  }
+}
+
+.win-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 500px;
+  height: 400px;
+  border: radius 10px;
+  background: rgb(241, 241, 241);
+  color: black;
+}
