@@ -245,7 +245,7 @@ export class View {
         <button class="btn car-controls__btn" data-car-id="${car.id.toString()}" data-car-action="test-create-winner">
           <i>[test] Create winner</i>
         </button>
-        <div class="car-controls__name">${car.name} [ID:${car.id.toString()}]</div>
+        <div class="car-controls__name">${car.name}</div>
       </div>
       <div class="car-box__track-container">
         <div class="car-box__track-controls">
