@@ -243,7 +243,7 @@ export class View {
           Remove
         </button>
         <button class="btn car-controls__btn" data-car-id="${car.id.toString()}" data-car-action="test-create-winner">
-          <i>[test] Create winner</i>
+          <i>[test] create winner</i>
         </button>
         <div class="car-controls__name">${car.name}</div>
       </div>
