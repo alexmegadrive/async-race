@@ -11,12 +11,6 @@ export interface IGarageCar {
   wins?: number;
   time?: number;
 }
-
-// export interface IWinnerCar {
-//   id: number;
-//   wins: number;
-//   bestTime: string;
-// }
 export interface IWinner {
   id: number;
   wins: number;
@@ -30,14 +24,25 @@ export interface INewWinner {
   name: string;
   color: string;
 }
-
+export interface IStartEngineResponse {
+  distance: number;
+  velocity: number;
+}
+export enum WinSort {
+  id = 'id',
+  wins = 'wins',
+  time = 'time',
+}
+export enum WinSortOrder {
+  asc = 'ASC',
+  desc = 'DESC',
+}
 export type GarageCars = IGarageCar[];
 export type WinnerCars = IWinner[];
 export interface IGetCarsResponse {
   cars: GarageCars | WinnerCars;
   totalCount: number;
 }
-
 export class Model {
   garageCars: GarageCars;
   winnerCars: WinnerCars;
@@ -56,12 +61,13 @@ export class Model {
   generateCars() {
     const count = 100;
     for (let i = 0; i < count; i++) {
-      const color = '#' + Math.floor(Math.random() * 16777215).toString(16);
       const brand = carBrands[Math.floor(Math.random() * carBrands.length)];
       const model = carModels[Math.floor(Math.random() * carModels.length)];
       const name = brand + ' ' + model;
-      // console.log(name, color);
-      this.API_createCar(name, color);
+      let color = Math.floor(Math.random() * 16777215).toString(16);
+      const colorStr = '#' + (color.length === 5 ? '0' + color : color);
+
+      this.API_createCar(name, colorStr);
     }
   }
 
@@ -77,17 +83,13 @@ export class Model {
   }
 
   async API_getCars(page: number) {
-    // console.log('this getcars', this);
-    // console.log('this.baseUrl :', this.baseUrl);
     const perPage = 7;
     let cars: GarageCars = [];
     let totalCount = 0;
+
     if (!page && !perPage) {
       const response = await fetch(`${this.baseUrl}/garage`);
       cars = await response.json();
-      // console.log('response :', response);
-      // console.log('result getcars:', result);
-      this.garageCars = cars;
     } else {
       const response = await fetch(
         `${this.baseUrl}/garage${this.generateQueryString([
@@ -97,45 +99,30 @@ export class Model {
       );
       cars = await response.json();
       totalCount = Number(response.headers.get('X-Total-Count'));
-      // console.log('totalPagesCount :', totalCount);
-      // console.log('response :', response);
-      // console.log('result getcars :', result);
-      this.garageCars = cars;
     }
     return { cars, totalCount };
   }
 
-  async API_getWinners(page: number) {
-    // const cars = this.API_getCars(0);
-    // const response = await fetch(`${this.baseUrl}/winners`);;
-    // const result = await response.json();
+  async API_getWinners(page: number, sort: WinSort, order: WinSortOrder) {
     const perPage = 10;
-
     let cars: WinnerCars = [];
-
-    // console.log('winners from api :', result);
-    // return result;
-
     let totalCount = 0;
+
     if (!page && !perPage) {
       const response = await fetch(`${this.baseUrl}/winners`);
+
       cars = await response.json();
-      // console.log('response :', response);
-      // console.log('result getcars:', result);
-      // this.garageCars = cars;
     } else {
       const response = await fetch(
         `${this.baseUrl}/winners${this.generateQueryString([
           { key: '_page', value: page.toString() },
           { key: '_limit', value: perPage.toString() },
+          { key: '_sort', value: sort },
+          { key: '_order', value: order },
         ])}`
       );
       cars = await response.json();
       totalCount = Number(response.headers.get('X-Total-Count'));
-      // console.log('totalPagesCount :', totalCount);
-      // console.log('response :', response);
-      // console.log('result getcars :', result);
-      // this.garageCars = cars;
     }
     return { cars, totalCount };
   }
@@ -145,7 +132,7 @@ export class Model {
       method: 'GET',
     });
     const result = await response.json();
-    console.log(result);
+    console.log('result :', result);
     return result;
   }
 
@@ -158,7 +145,6 @@ export class Model {
       },
     });
     const result = await response.json();
-    console.log(result);
   }
 
   async API_updateCar(id: number, name: string, color: string) {
@@ -173,7 +159,7 @@ export class Model {
     console.log(result);
   }
 
-  async API_removeCar(id: number) {
+  async API_removeCar_Garage(id: number) {
     const response = await fetch(`${this.baseUrl}/garage/${id}`, {
       method: 'DELETE',
     });
@@ -182,75 +168,41 @@ export class Model {
     return response;
   }
 
+  async API_removeCar_Winners(id: number) {
+    const response = await fetch(`${this.baseUrl}/winners/${id}`, {
+      method: 'DELETE',
+    });
+    const result = await response.json();
+    return response;
+  }
+
   async API_handleWinner(winner: INewWinner) {
-    // console.log('new winner :', winner);
     const { id, time, name, color } = winner;
+
     this.API_getWinner(id).then(async (response) => {
       if (response.ok) {
         const result: IWinner = await response.json();
-        console.log('найден winner, update :', result);
-        const wins = result.wins + 1;
-
-        let bestTime = time < Number(winner.time) ? time : Number(winner.time);
-        // if (time < bestTime) bestTime = time;
-        const updatedWinner = { id, time, color, name, wins };
+        console.log('найден winner, проводим update :', result);
+        let bestTime = time < Number(result.time) ? time : Number(result.time);
+        const updatedWinner = { id, time: bestTime, color, name, wins: (result.wins += 1) };
 
         await this.API_updateWinner(updatedWinner);
-        // const winners = await this.API_getWinners();
-        // console.log('winners', winners);
       } else {
-        console.log('response не найден, create :', response);
-        // console.log('не найден, создаем нового');
+        console.log('winner не найден, проводим create :', response);
         await this.API_createWinner(winner);
-        // const winners = await this.API_getWinners();
-        // console.log('winners', winners);
       }
     });
-    // const winners = await this.API_getWinners();
-    // console.log('winners', winners);
-    // const response = await this.API_getWinner(id);
-
-    // await this.API_getWinner(id)
-    //   .then(async (response) => {
-    //     console.log('response handlewinner :', response);
-    //     const result: IWinner = response.json();
-    //     console.log('result handlewinner :', result);
-    //     if (response.ok) {
-    //       // const result: IWinner = await response.json();
-    //       // const winner = response.json();
-    //       const wins = result.wins + 1;
-    //       let bestTime = winner.time;
-    //       if (time < bestTime) bestTime = time;
-    //       this.API_updateWinner(id, wins, bestTime);
-    //     } else {
-    //       this.API_createWinner(winner);
-    //       console.log('Winner not found, creating winner');
-    //       console.log('result found winner :', response);
-
-    //       // console.log('response :', response);
-    //       // console.log('response json:', response.json());
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
-    // console.log('all winners', this.API_getWinners);
   }
 
   async API_getWinner(id: number) {
     const response = await fetch(`${this.baseUrl}/winners/${id}`, {
       method: 'GET',
     });
-    // const result = await response.json();
-    // console.log('result getWinner:', result);
-
     return response;
   }
 
   async API_createWinner(winner: INewWinner) {
-    // console.log(' create winner enter:', winner);
     const { id, time, color, name } = winner;
-
     const response = await fetch(`${this.baseUrl}/winners`, {
       method: 'POST',
       body: JSON.stringify({ id, wins: 1, time, color, name }),
@@ -259,59 +211,11 @@ export class Model {
       },
     });
     const result = await response.json();
-    // console.log('create winnr result', result);
     return result;
   }
 
-  // async API_handleWinner(id: number, time: number) {
-  //   this.API_getWinners();
-
-  //   const winner = await this.API_getWinner(id)
-  //     .then((winner) => {
-  //       console.log(winner);
-  //       // if (!winner) {
-  //       //   this.API_createWinner(id, time);
-  //       // }
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  //   // console.log('winner API_handleWinner:', winner);
-
-  //   // if (!winner) {
-  //   //   this.API_createWinner(id, time);
-  //   // }
-  //   // await this.API_getWinner(id)
-  //   //   .then((result) => {
-  //   //     console.log('result :', result);
-  //   //     console.log('ветка есть winer');
-  //   //     // const response = result.json();
-  //   //     // const wins = response.wins++ ;
-  //   //     const wins = 1;
-  //   //     // const time = response.time;
-  //   //     this.API_updateWinner(id, wins, time);
-  //   //   })
-  //   //   .catch((error) => {
-  //   //     console.log('ветка нет winer');
-  //   //     this.API_createWinner(id, time);
-  //   //   });
-
-  //   // if (!winner) {
-  //   //   console.log('ветка нет winer');
-
-  //   //   this.API_createWinner(id, time);
-  //   // } else {
-  //   //   console.log('ветка есть winer');
-  //   //   console.log('winner :', winner);
-
-  //   //   const wins = winner.wins++;
-  //   //   const time = winner.time;
-  //   //   this.API_updateWinner(id, wins, time);
-  //   // }
-  // }
   async API_updateWinner(updatedWinner: IWinner) {
     const { id, time, color, name, wins } = updatedWinner;
-
     const response = await fetch(`${this.baseUrl}/winners/${id}`, {
       method: 'PATCH',
       body: JSON.stringify({ wins, time, name, color }),
@@ -322,7 +226,5 @@ export class Model {
     const result = await response.json();
     console.log('result patch Update Winner  :', result);
     return result;
-    // console.log('result :', result);
-    // console.log(result);
   }
 }

@@ -39,16 +39,21 @@
   -webkit-mask-repeat: no-repeat;
   // -webkit-mask-size: cover;
   mask-size: contain;
-  -webkit-mask-image: url(http://localhost:3001/assets/img/car.svg);
-  mask-image: url(http://localhost:3001/assets/img/car.svg);
+  -webkit-mask-image: url('./assets/img/car.svg');
+  mask-image: url('./assets/img/car.svg');
   // background-color: blue; /* Or any color of your choice. */
 
-  &::before {
-    position: absolute;
-    content: '';
-    // width: 100%;
-    // height: 100%;
-    // background-repeat: no-repeat;
-    // background: url('./assets/img/car.svg');
+  &--looser {
+    background: linear-gradient(0deg, red 0%, transparent 50%, transparent);
+  }
+  &--flame {
+    &::before {
+      position: absolute;
+      background-size: contain;
+      content: '';
+      width: 25px;
+      height: 25px;
+      background: url('./assets/img/flame.png');
+    }
   }
 }
