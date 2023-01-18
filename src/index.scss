@@ -4,10 +4,10 @@
 @import './styles/winners.scss';
 
 #app {
+  box-sizing: border-box;
   width: 100%;
   margin: 0;
   padding: 10px;
-  box-sizing: border-box;
 }
 
 .btn {
@@ -18,8 +18,8 @@
     background: darkorange;
   }
   &--disabled {
-    opacity: 0.5;
     cursor: not-allowed;
+    opacity: 0.5;
     &:hover {
       background: none;
     }
@@ -28,20 +28,14 @@
 
 .car {
   position: relative;
-  // width: 150px;
-  // height: 150px;
-  background-size: contain;
   width: 100px;
   height: 50px;
-  // background-repeat: no-repeat;
-  // background: url(http://localhost:3001/assets/img/car.svg);
-  -webkit-mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
-  // -webkit-mask-size: cover;
-  mask-size: contain;
+  background-size: contain;
   -webkit-mask-image: url('./assets/img/car.svg');
   mask-image: url('./assets/img/car.svg');
-  // background-color: blue; /* Or any color of your choice. */
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
 
   &--looser {
     background: linear-gradient(0deg, red 0%, transparent 50%, transparent);
@@ -49,10 +43,10 @@
   &--flame {
     &::before {
       position: absolute;
-      background-size: contain;
-      content: '';
       width: 25px;
       height: 25px;
+      background-size: contain;
+      content: '';
     }
   }
 }
